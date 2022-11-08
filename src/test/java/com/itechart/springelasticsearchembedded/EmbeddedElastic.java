@@ -72,7 +72,12 @@ public class EmbeddedElastic {
         public PluginNode(Map<String, String> preparedSettings) {
             super(
                     InternalSettingsPreparer.prepareEnvironment(Settings.EMPTY, preparedSettings, null, () -> "node-test"),
-                    settings -> new PluginsService(settings, null, null, Path.of("src/test/java/com/itechart/plugin")),
+                    settings -> new PluginsService(
+                            settings,
+                            null,
+                            null,
+                            Path.of(System.getProperty("user.dir"), "src", "test", "resources", "elasticsearch", "plugins")
+                    ),
                     false
             );
             log.info("Started local elastic");
