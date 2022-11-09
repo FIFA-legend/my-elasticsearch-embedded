@@ -125,6 +125,15 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>otherOutputDir</id>
+			<build>
+				<directory>D:\temp\t</directory>
+			</build>
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>
