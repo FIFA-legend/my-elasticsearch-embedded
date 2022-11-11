@@ -3,6 +3,7 @@ package com.itechart.springelasticsearchembedded;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.cluster.ClusterName;
+import org.elasticsearch.common.logging.LogConfigurator;
 import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.discovery.DiscoveryModule;
@@ -13,7 +14,10 @@ import org.elasticsearch.plugins.PluginsService;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,9 +75,24 @@ public class EmbeddedElastic {
     private static class PluginNode extends Node {
         public PluginNode(Map<String, String> preparedSettings) {
             super(
-                    InternalSettingsPreparer.prepareEnvironment(Settings.EMPTY, preparedSettings, null, () -> "node-test"),
-                    settings -> new PluginsService(settings, null, null, Path.of("src/test/java/com/itechart/plugin")),
-                    false
+                InternalSettingsPreparer.prepareEnvironment(Settings.EMPTY, preparedSettings, null, () -> "node-test"),
+                settings -> {
+                    URL resource = EmbeddedElastic.class.getClassLoader().getResource("elasticsearch/plugins");
+                    Path path = null;
+                    try {
+                        if (resource != null) path = Paths.get(resource.toURI());
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                    LogConfigurator.configureESLogging();
+                    return new PluginsService(
+                        settings,
+                        null,
+                        null,
+                        path
+                    );
+                },
+                false
             );
             log.info("Started local elastic");
         }
