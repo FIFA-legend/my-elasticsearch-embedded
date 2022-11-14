@@ -2,6 +2,8 @@ package com.itechart.springelasticsearchembedded;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.IndexResponse;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
@@ -15,12 +17,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 
 @SpringBootTest
-@EnableAutoConfiguration(exclude = ElasticsearchRestClientAutoConfiguration.class)
+@EnableAutoConfiguration(exclude = {ElasticsearchRestClientAutoConfiguration.class, DataSourceAutoConfiguration.class})
 public class ElasticsearchTest {
 
     private static ElasticsearchClient elasticsearchClient;
@@ -60,7 +63,7 @@ public class ElasticsearchTest {
         String index = "persons-2";
 
         try {
-            co.elastic.clients.elasticsearch.core.IndexResponse response = elasticsearchClient.index(i -> i
+            IndexResponse response = elasticsearchClient.index(i -> i
                 .index(index)
                 .id(id)
                 .document(person)
@@ -71,7 +74,7 @@ public class ElasticsearchTest {
 
             Thread.sleep(2000);
 
-            co.elastic.clients.elasticsearch.core.SearchResponse<Person> search = elasticsearchClient.search(s -> s
+            SearchResponse<Person> search = elasticsearchClient.search(s -> s
                     .index(index)
                     .query(q -> q
                         .match(t -> t
